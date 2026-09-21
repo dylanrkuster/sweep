@@ -1,5 +1,5 @@
-# Sweep
+# sweep
 
-Handle my inbox the way I would.
+handle my inbox the way i would.
 
-Sweep's first milestone is observable archive/keep autopilot for Gmail: show each email and proposed action, wait for the selected viewing interval, apply the action, and advance automatically. Include pause, skip, and undo.
+sweep's first milestone is observable archive/keep autopilot for gmail: show each email and proposed action, wait for the selected viewing interval, apply the action, and advance automatically. include pause, skip, and undo.

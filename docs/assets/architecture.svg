@@ -26,7 +26,7 @@
   <text x="48" y="79" class="legend">Google</text>
   <rect x="138" y="66" width="13" height="13" rx="3" fill="#f5d75a"/>
   <text x="160" y="79" class="legend">Modal</text>
-  <text x="266" y="79" class="legend">Selected design · implementation in progress</text>
+  <text x="266" y="79" class="legend">MVP architecture · not yet deployed</text>
 
   <!-- Connections are drawn before the components so labels remain unobstructed. -->
   <path class="edge both" d="M 266 174 H 413"/>

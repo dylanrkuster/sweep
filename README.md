@@ -2,13 +2,24 @@
 
 Handle my inbox the way I would.
 
-Sweep's first milestone is observable archive/keep autopilot for Gmail: show each email and proposed action, wait for the selected viewing interval, apply the action, and advance automatically. Include pause, skip, and undo.
+Sweep is an open-source Gmail add-on for clearing unread email with one button.
+
+Set your preferences, choose how many unread emails to sweep, and press **Sweep**. The MVP processes messages from newest to oldest, one at a time. Laya English makes one decision per email: **archive** or **move to Trash**. Successfully processed messages are marked read, and Sweep saves a summary of the results.
+
+Delete means Gmail's recoverable Trash behavior; Sweep does not permanently delete messages. Gmail ordinarily removes trashed mail after 30 days.
 
 ## Project status
 
-Planning only. The repository was empty when inspected on September 21, 2026. No application, mailbox connection, Jev call, or model evaluation has been completed.
+MVP scope finalized September 22, 2026. Implementation has not started; no application, mailbox connection or model evaluation has been completed.
 
-- [Product handoff](docs/product-handoff.md): the supplied product context, preserved verbatim.
-- [Prototype proposal](docs/prototype-plan.md): proposed implementation, setup requirements, and completion criteria.
+- Native Gmail Google Workspace add-on.
+- Python API and background worker hosted on Modal.
+- Google Firestore for preferences, job state and saved results.
+- Laya English with an initial 2,048-token decision context.
+- Initial hosting target: recurring free allowances, subject to measured usage.
 
-Browser/viewer preference and availability of Google OAuth and Jev access are awaiting the user's response. Defaults in the proposal are recommendations, not confirmed decisions.
+The first implementation milestone is a standalone evaluator using synthetic emails to check decisions, memory use and latency. Custom labels, billing and enterprise features are later work.
+
+## License
+
+Sweep's application code uses the [MIT License](LICENSE). Model weights and dependencies retain their respective licenses. A paid managed service may be offered separately.

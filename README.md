@@ -10,7 +10,7 @@ Delete means Gmail's recoverable Trash behavior; Sweep does not permanently dele
 
 ## Project status
 
-MVP scope finalized September 22, 2026. Implementation has not started; no application, mailbox connection or model evaluation has been completed.
+MVP scope finalized September 22, 2026. The local Python foundation is implemented: shared email objects, a synthetic fixture loader and a read-only fake mailbox. Laya inference, Gmail integration and hosting are still to come.
 
 - Native Gmail Google Workspace add-on.
 - Python API and background worker hosted on Modal.
@@ -19,6 +19,20 @@ MVP scope finalized September 22, 2026. Implementation has not started; no appli
 - Initial hosting target: recurring free allowances, subject to measured usage.
 
 The first implementation milestone is a standalone evaluator using synthetic emails to check decisions, memory use and latency. Custom labels, billing and enterprise features are later work.
+
+## Run the foundation locally
+
+With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, run these commands from this repository:
+
+```sh
+uv sync --locked
+uv run --locked python -m sweep.testing --messages tests/fixtures/messages.jsonl --cases tests/fixtures/cases.jsonl
+uv run --locked pytest
+```
+
+The first command creates an isolated Python 3.11 environment and installs the versions in `uv.lock`. The fixture command validates the sample emails and separate answer key, then assembles decision inputs. It does not load Laya, make predictions or connect to Gmail. See the [development guide](docs/development.md) for a tour of the code and fixture format.
+
+If Python cannot find `sweep`, see the [setup troubleshooting notes](docs/development.md#troubleshooting-python-cannot-find-sweep), including the macOS hidden-file issue encountered during initial development.
 
 ## Architecture
 

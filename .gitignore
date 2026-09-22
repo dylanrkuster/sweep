@@ -1,0 +1,30 @@
+# Local Python environments and generated files
+.venv
+venv/
+.cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Downloaded model files and generated evaluation output
+models/
+reports/
+*.safetensors
+*.pt
+*.pth
+
+# Credentials and future private mailbox fixtures
+.env
+.env.*
+!.env.example
+secrets/
+tests/fixtures/private/
+*.pem
+*.key
+
+.DS_Store

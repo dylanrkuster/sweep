@@ -1,0 +1,20 @@
+[project]
+name = "sweep"
+version = "0.1.0"
+description = "A Gmail sweep assistant, starting with a local evaluation foundation."
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.3,<10"]
+
+[build-system]
+requires = ["uv_build==0.12.5"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"

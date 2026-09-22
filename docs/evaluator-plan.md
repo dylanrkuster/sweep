@@ -1,6 +1,6 @@
 # Building the standalone Laya evaluator
 
-**Status: implementation plan.** The evaluator, fixtures and commands described below have not been implemented. This is the first build milestone for [Sweep's MVP](product.md). It needs no Gmail account or cloud deployment.
+**Status: foundation implemented; full evaluator planned.** The Python package, shared message/input objects, strict fixture loader, read-only fake mailbox and a small synthetic seed dataset are implemented. Run them using the [development guide](development.md). Laya loading, context construction, scoring, the full evaluation corpus and the `sweep.evaluation` command below are still planned. This milestone needs no Gmail account or cloud deployment.
 
 The milestone has two outputs: a reusable way to represent test emails, and a program that evaluates Laya's archive/delete decisions against expected answers. The same input format and context-building code will later feed the real sweep worker. Model scores do not directly execute mailbox changes.
 
@@ -107,7 +107,7 @@ These fixtures are an engineering check, not a representative sample proving pro
 
 ## 4. Build the smallest useful fake mailbox
 
-For this milestone, the fake mailbox needs only fixture loading, message lookup, earlier-thread lookup and reset. Store an immutable initial snapshot and return independent copies so one test cannot contaminate another. Sort prior thread messages by the same timestamp/tie-breaking rule used by the real pipeline; exclude later replies and duplicate quoted material from the selected context.
+For this milestone, the fake mailbox needs only fixture loading, message lookup, earlier-thread lookup and reset. Store an immutable initial snapshot and return immutable messages so one test cannot contaminate another. Only strictly earlier timestamps qualify for prior context; sort them by timestamp and message ID. Exclude peers sharing the target's timestamp because their order is unknown. The later context builder will remove duplicated quoted material; the mailbox preserves the raw fixture text.
 
 Use a small `Mailbox` interface so the next milestone can extend the same implementation with candidate paging and label changes. The reusable shape is:
 

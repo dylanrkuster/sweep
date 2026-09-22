@@ -1,6 +1,6 @@
-# Sweep
+# sweep
 
-Handle my inbox the way I would.
+handle my inbox the way i would.
 
 Sweep is an open-source Gmail add-on for clearing unread email with one button.
 

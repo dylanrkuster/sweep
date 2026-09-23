@@ -35,14 +35,7 @@ See [baseline results](baseline.md) and the [evaluator reference](evaluator-plan
 
 ## Code map
 
-| Location | Purpose |
-| --- | --- |
-| `pyproject.toml`, `uv.lock` | Project settings and pinned dependencies. |
-| `src/sweep/domain.py` | Shared email, attachment and decision-input objects. |
-| `src/sweep/testing/` | Fixture loaders, fake mailbox and fixture-check command. |
-| `src/sweep/decisions/` | Context, model loading/inference and archive/delete policy. |
-| `src/sweep/evaluation/` | CLI, case runner, metrics and reports. |
-| `tests/` | Fast tests, seed examples and 40 evaluation cases. |
+[Browse the current code map](code-map.md) to see files, major functions and their connections. Update it whenever those responsibilities or connections change. The [architecture guide](architecture.md) describes the planned Gmail and cloud system.
 
 ## How evaluation works
 

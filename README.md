@@ -49,6 +49,7 @@ This is the selected design, not a deployed system or a measured performance pro
 We begin with a standalone Laya evaluator and a reusable fake mailbox. Synthetic messages stay separate from their expected answers, so Laya only receives email content and preferences. The same message format and decision code will later serve the real Gmail worker; the fake mailbox will grow to support job and recovery tests.
 
 - [Product scope](docs/product.md): MVP behavior, decisions and input budgets.
+- [Code map](docs/code-map.md): current files, major functions and how they connect.
 - [Architecture explained](docs/architecture.md): components, communication and job lifecycle.
 - [Database design](docs/database.md): proposed records, example documents and recovery rules.
 - [Evaluator implementation plan](docs/evaluator-plan.md): the first build, step by step.

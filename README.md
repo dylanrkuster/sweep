@@ -1,53 +1,49 @@
 # Sweep
 
-Handle my inbox the way I would.
+Sweep will be a Gmail add-on that clears a chosen number of unread emails using your written preferences. For each email, Laya chooses **Archive** or **move to Trash**; Sweep marks successful decisions read and saves a summary.
 
-Sweep is an open-source Gmail add-on for clearing unread email with one button.
+**Status:** The local evaluator and fake mailbox work. The Gmail add-on, Modal worker, and Firestore storage are planned. The current model baseline archives every valid test case, so it is not ready to change a real inbox.
 
-Set your preferences, choose how many unread emails to sweep, and press **Sweep**. The MVP processes messages from newest to oldest, one at a time. Laya English makes one decision per email: **archive** or **move to Trash**. Successfully processed messages are marked read, and Sweep saves a summary of the results.
+## Code map
 
-Delete means Gmail's recoverable Trash behavior; Sweep does not permanently delete messages. Gmail ordinarily removes trashed mail after 30 days.
+Follow the pink arrows. Solid boxes are implemented; dashed boxes are planned. File paths are under `src/sweep/`.
 
-## Project status
+```mermaid
+flowchart TB
+    start["1. Start local evaluation<br/>evaluation/__main__.py<br/>main()"]
+    fixtures["2. Load sample emails and answers<br/>testing/fixtures.py<br/>load_messages() and load_cases()"]
+    runner["3. Run each case<br/>evaluation/runner.py<br/>run_cases()"]
+    fake["4. Read the fake mailbox<br/>testing/mailbox.py<br/>InMemoryMailbox"]
+    engine["5. Decide one email<br/>decisions/engine.py<br/>evaluate_decision()"]
+    context["6. Prepare the model input<br/>decisions/context.py<br/>build_context()"]
+    laya["7. Score Archive and Trash<br/>decisions/laya.py<br/>LayaRuntime.predict()"]
+    policy["8. Choose the final action<br/>decisions/policy.py<br/>apply_policy()"]
+    compare["9. Compare with the answer key<br/>evaluation/runner.py<br/>CaseResult"]
+    report["10. Save scores and timings<br/>evaluation/reports.py and metrics.py<br/>write_reports()"]
 
-MVP scope finalized September 22, 2026. The standalone Laya evaluator is implemented, with synthetic emails, exact context budgeting and decision reports. Initial decision quality needs improvement; Gmail integration and hosting are still to come.
+    gmail_ui["Gmail add-on · planned<br/>Preferences, number of emails, Sweep button"]
+    api["Modal API + job · planned<br/>Select unread emails, newest first"]
+    worker["Modal worker · planned<br/>Process one email at a time"]
+    gmail_api["Gmail API · planned<br/>Archive or Trash, then mark read"]
+    firestore["Firestore · planned<br/>Save job progress and result counts"]
 
-- Native Gmail Google Workspace add-on.
-- Python API and background worker hosted on Modal.
-- Google Firestore for preferences, job state and saved results.
-- Laya English with an initial 2,048-token decision context.
-- Initial hosting target: recurring free allowances, subject to measured usage.
+    start --> fixtures --> runner --> fake --> engine --> context --> laya --> policy --> compare --> report
+    gmail_ui --> api --> worker
+    worker -->|reuse decision code| engine
+    policy -->|hosted sweep| gmail_api --> firestore
+    worker --> firestore
 
-The first implementation milestone is a standalone evaluator using synthetic emails to check decisions, memory use and latency. Custom labels, billing and enterprise features are later work.
-
-## Run the foundation locally
-
-With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, run these commands from this repository:
-
-```sh
-uv sync --locked
-uv run --locked python -m sweep.testing --messages tests/fixtures/messages.jsonl --cases tests/fixtures/cases.jsonl
-uv run --locked pytest
+    linkStyle default stroke:#e46b9f,stroke-width:4px;
+    classDef input fill:#414141,stroke:#4c90ea,stroke-width:3px,color:#ffffff;
+    classDef work fill:#414141,stroke:#d49418,stroke-width:3px,color:#ffffff;
+    classDef output fill:#414141,stroke:#32966e,stroke-width:3px,color:#ffffff;
+    classDef planned fill:#303b49,stroke:#74b7ff,stroke-width:3px,stroke-dasharray:7 5,color:#ffffff;
+    class fixtures,fake input;
+    class start,runner,engine,context,laya,policy,compare work;
+    class report output;
+    class gmail_ui,api,worker,gmail_api,firestore planned;
 ```
 
-The first command creates an isolated Python 3.11 environment and installs the versions in `uv.lock`. The fixture command validates the sample emails and separate answer key, then assembles decision inputs. It does not load Laya, make predictions or connect to Gmail. See the [development guide](docs/development.md) for a tour of the code and fixture format.
+The evaluator compares answers only **after** the decision. It does not change Gmail.
 
-To run the real model, follow [Run Laya](docs/development.md#run-laya). The [first baseline](docs/baseline.md) records both performance and the current decision-quality limitations.
-
-If Python cannot find `sweep`, see the [setup troubleshooting notes](docs/development.md#troubleshooting-python-cannot-find-sweep), including the macOS hidden-file issue encountered during initial development.
-
-## Architecture
-
-[Explore the architecture](docs/architecture.md) to see the planned Gmail system and the code implemented so far.
-
-## Development plan
-
-We begin with a standalone Laya evaluator and a reusable fake mailbox. Synthetic messages stay separate from their expected answers, so Laya only receives email content and preferences. The same message format and decision code will later serve the real Gmail worker; the fake mailbox will grow to support job and recovery tests.
-
-- [Product scope](docs/product.md): MVP behavior, decisions and input budgets.
-- [Database design](docs/database.md): proposed records, example documents and recovery rules.
-- [Evaluator implementation plan](docs/evaluator-plan.md): the first build, step by step.
-
-## License
-
-Sweep's application code uses the [MIT License](LICENSE). Model weights and dependencies retain their respective licenses. A paid managed service may be offered separately.
+[Quickstart](docs/development.md) · [MVP scope](docs/product.md) · [MIT License](LICENSE)

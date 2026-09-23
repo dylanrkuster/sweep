@@ -24,12 +24,14 @@ flowchart TB
     gmail_ui("Gmail add-on · planned<br/>Preferences, number of emails, Sweep button")
     api("Modal API + job · planned<br/>Select unread emails, newest first")
     worker("Modal worker · planned<br/>Process one email at a time")
+    model_files("Model files · planned<br/>Modal Volume: weights and tokenizer")
     gmail_api("Gmail API · planned<br/>Archive or Trash, then mark read")
     firestore("Firestore · planned<br/>Save job progress and result counts")
 
     start --> fixtures --> runner --> fake --> engine --> context --> laya --> policy --> compare --> report
     gmail_ui --> api --> worker
     worker -->|reuse decision code| engine
+    model_files --> laya
     policy -->|hosted sweep| gmail_api --> firestore
 
     linkStyle default stroke:#e46b9f,stroke-width:4px;
@@ -40,7 +42,7 @@ flowchart TB
     class fixtures,fake input;
     class start,runner,engine,context,laya,policy,compare work;
     class report output;
-    class gmail_ui,api,worker,gmail_api,firestore planned;
+    class gmail_ui,api,worker,model_files,gmail_api,firestore planned;
 ```
 
 The evaluator compares answers only **after** the decision. It does not change Gmail.

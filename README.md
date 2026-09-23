@@ -4,6 +4,8 @@ Sweep will be a Gmail add-on that clears a chosen number of unread emails using 
 
 **Status:** The local evaluator and fake mailbox work. The Gmail add-on, Modal worker, and Firestore storage are planned. The current model baseline archives every valid test case, so it is not ready to change a real inbox.
 
+**Development:** [MVP board](https://github.com/users/dylanrkuster/projects/4) · [Ready queue](https://github.com/users/dylanrkuster/projects/4/views/2) (collaborator access required). Pick an unassigned, unblocked issue by priority, then queue order.
+
 ## Code map
 
 The planned Gmail system and the code built so far. Blank service boxes are still to be implemented.

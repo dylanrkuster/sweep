@@ -1,67 +1,61 @@
 # Code map
 
-This map shows **code that exists now**. Arrows mean a function calls another function or passes it data. The [architecture guide](architecture.md) shows the planned Gmail, Modal and Firestore system.
+This map shows **code that exists now**. The [architecture guide](architecture.md) shows the planned Gmail, Modal and Firestore system.
+
+**How to read it:** Start at **1** and follow the pink arrows downward. A box names a Python file, a main function and its job. Arrows show where information goes; side boxes supply supporting information. Blue borders mark inputs, gold marks work, and green marks results. File paths start at `src/sweep/` unless they say `tests/`.
+
+For one sample email, Sweep reads its content, asks Laya whether to archive or delete it, compares the answer with the expected result, then records that result in a report.
 
 ## From sample emails to a report
 
 ```mermaid
-flowchart LR
-    samples["tests/fixtures/<br/>Emails and separate answers"]
-    loader["testing/fixtures.py<br/>load_messages(): validate emails<br/>load_cases(): validate answers"]
-    check["testing/__main__.py<br/>main(): check fixtures only"]
-    evaluate["evaluation/__main__.py<br/>main(): run evaluation"]
-    mailbox["testing/mailbox.py<br/>InMemoryMailbox: read sample mail"]
-    runner["evaluation/runner.py<br/>run_cases(): build inputs and compare answers"]
-    decision["decisions/engine.py<br/>evaluate_decision(): decide one email"]
-    reports["evaluation/reports.py<br/>write_reports(): save results"]
-    metrics["evaluation/metrics.py<br/>summarize(), timing_summary(): score results"]
+flowchart TB
+    evaluate["1. Start evaluation<br/>evaluation/__main__.py<br/>main()"]
+    loader["2. Load sample emails and answers<br/>testing/fixtures.py<br/>load_messages() and load_cases()"]
+    runner["3. Prepare each case<br/>evaluation/runner.py<br/>run_cases()"]
+    mailbox["4. Read the sample mailbox<br/>testing/mailbox.py<br/>InMemoryMailbox"]
+    decision["5. Decide archive or delete<br/>decisions/engine.py<br/>evaluate_decision()"]
+    metrics["Count correct answers and timings<br/>evaluation/metrics.py<br/>summarize() and timing_summary()"]
+    reports["6. Save the report<br/>evaluation/reports.py<br/>write_reports()"]
 
-    samples --> loader
-    check --> loader
-    evaluate --> loader
-    loader --> runner
-    evaluate --> runner
-    runner --> mailbox
-    runner --> decision
-    runner -->|results via main| reports
-    evaluate --> reports
-    reports --> metrics
+    evaluate --> loader --> runner --> mailbox --> decision --> reports
+    metrics --> reports
+
+    linkStyle default stroke:#d16293,stroke-width:4px;
 
     classDef input fill:#e8f1ff,stroke:#3772c8,stroke-width:2px,color:#172b4d;
     classDef work fill:#fff3d6,stroke:#b47700,stroke-width:2px,color:#362500;
     classDef output fill:#e4f5ec,stroke:#27815a,stroke-width:2px,color:#143728;
-    class samples,loader,mailbox input;
-    class check,evaluate,runner,decision work;
+    class loader,mailbox input;
+    class evaluate,runner,decision work;
     class reports,metrics output;
 ```
 
-The fixture-check command runs `testing/__main__.py:main()` and stops after assembling inputs; it never runs Laya. The evaluator command runs `evaluation/__main__.py:main()`. It sends the **email and preferences** to the decision code, then `run_cases()` compares the result with the separate answer key. The answer is never sent to Laya.
+The samples live in `tests/fixtures/`. Step 3 repeats steps 4–5 for each case. It compares the decision with the separate answer **after** Laya runs; Laya never sees the expected answer. The separate fixture-check command, `testing/__main__.py:main()`, checks the sample data without running the model.
 
 ## One decision
 
 ```mermaid
-flowchart LR
-    data["domain.py<br/>DecisionInput: preferences + current and prior mail"]
-    engine["decisions/engine.py<br/>evaluate_decision(): coordinate one decision"]
-    context["decisions/context.py<br/>build_context(): validate and count tokens"]
-    question["decisions/question.py<br/>decision_question(): archive/delete choices"]
-    model["decisions/laya.py<br/>LayaRuntime: load model, then score choices"]
-    files["decisions/artifacts.py<br/>verify_model(): check pinned files"]
-    policy["decisions/policy.py<br/>apply_policy(): validate scores, apply threshold"]
+flowchart TB
+    data["1. Gather the input<br/>domain.py<br/>DecisionInput"]
+    engine["2. Coordinate the decision<br/>decisions/engine.py<br/>evaluate_decision()"]
+    context["3. Prepare complete model input<br/>decisions/context.py<br/>build_context()"]
+    model["4. Score both choices<br/>decisions/laya.py<br/>LayaRuntime.predict()"]
+    policy["5. Choose the final action<br/>decisions/policy.py<br/>apply_policy()"]
+    question["Defines archive/delete choices<br/>decisions/question.py<br/>decision_question()"]
+    files["Checks model files at startup<br/>decisions/artifacts.py<br/>verify_model()"]
 
-    data --> engine
-    engine --> context
-    context --> question
-    engine --> model
-    model -->|during setup| files
-    model -.->|tokenizer for context| context
-    engine --> policy
+    data --> engine --> context --> model --> policy
+    question --> context
+    files --> model
+
+    linkStyle default stroke:#d16293,stroke-width:4px;
 
     classDef inputNode fill:#e8f1ff,stroke:#3772c8,stroke-width:2px,color:#172b4d;
     classDef work fill:#fff3d6,stroke:#b47700,stroke-width:2px,color:#362500;
     classDef output fill:#e4f5ec,stroke:#27815a,stroke-width:2px,color:#143728;
-    class data,files inputNode;
-    class engine,context,question,model work;
+    class data,question,files inputNode;
+    class engine,context,model work;
     class policy output;
 ```
 

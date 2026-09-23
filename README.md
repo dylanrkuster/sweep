@@ -10,7 +10,7 @@ Delete means Gmail's recoverable Trash behavior; Sweep does not permanently dele
 
 ## Project status
 
-MVP scope finalized September 22, 2026. The local Python foundation is implemented: shared email objects, a synthetic fixture loader and a read-only fake mailbox. Laya inference, Gmail integration and hosting are still to come.
+MVP scope finalized September 22, 2026. The standalone Laya evaluator is implemented, with synthetic emails, exact context budgeting and decision reports. Initial decision quality needs improvement; Gmail integration and hosting are still to come.
 
 - Native Gmail Google Workspace add-on.
 - Python API and background worker hosted on Modal.
@@ -31,6 +31,8 @@ uv run --locked pytest
 ```
 
 The first command creates an isolated Python 3.11 environment and installs the versions in `uv.lock`. The fixture command validates the sample emails and separate answer key, then assembles decision inputs. It does not load Laya, make predictions or connect to Gmail. See the [development guide](docs/development.md) for a tour of the code and fixture format.
+
+To run the real model, follow [Run Laya](docs/development.md#run-laya). The [first baseline](docs/baseline.md) records both performance and the current decision-quality limitations.
 
 If Python cannot find `sweep`, see the [setup troubleshooting notes](docs/development.md#troubleshooting-python-cannot-find-sweep), including the macOS hidden-file issue encountered during initial development.
 

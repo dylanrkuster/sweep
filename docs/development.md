@@ -1,8 +1,8 @@
 # Development
 
-**Working now:** Python setup, synthetic email loading, a read-only fake mailbox and tests.
+**Working now:** a local Laya evaluator, synthetic mailbox, exact token budgeting, decision policy, reports and tests.
 
-**Next:** more examples, context preparation and Laya inference. Gmail and cloud integration come later.
+**Next:** improve decision quality. The first prompt archives too much; Gmail and cloud integration remain unimplemented.
 
 ## Run locally
 
@@ -20,22 +20,36 @@ uv run --locked pytest
 
 The environment is separate from other Python projects. Sweep uses an editable install, so source changes take effect without reinstalling.
 
+## Run Laya
+
+```sh
+uv sync --locked --extra model
+uv run --locked --extra model python -m sweep.evaluation --download-model
+```
+
+The first run downloads the pinned English model (about 860 MB). Later runs can omit `--download-model`; inference uses local files only. Defaults: CPU, two threads, 2,048 tokens, development cases and an experimental 0.8 delete threshold.
+
+Results go to a new timestamped folder under `reports/`: `report.md`, `results.json` and `cases.csv`. Use `--split held_out` to evaluate the separate test cases after choosing the prompt and policy. Keep those cases out of tuning.
+
+See [baseline results](baseline.md) and the [evaluator reference](evaluator-plan.md).
+
 ## Code map
 
 | Location | Purpose |
 | --- | --- |
 | `pyproject.toml`, `uv.lock` | Project settings and pinned dependencies. |
 | `src/sweep/domain.py` | Shared email, attachment and decision-input objects. |
-| `src/sweep/testing/fixtures.py` | Loads emails and separate expected answers. |
-| `src/sweep/testing/mailbox.py` | Retrieves messages and earlier thread context. |
-| `src/sweep/testing/__main__.py` | Runs the fixture command. |
-| `tests/` | Tests and a small synthetic seed dataset. |
+| `src/sweep/testing/` | Fixture loaders, fake mailbox and fixture-check command. |
+| `src/sweep/decisions/` | Context, model loading/inference and archive/delete policy. |
+| `src/sweep/evaluation/` | CLI, case runner, metrics and reports. |
+| `tests/` | Fast tests, seed examples and 40 evaluation cases. |
 
-## How the fixture check works
+## How evaluation works
 
 1. Load mailbox facts from `messages.jsonl` and expected answers from `cases.jsonl`.
 2. Retrieve each target email and earlier messages in its thread.
-3. Build a `DecisionInput` containing preferences and emails. Expected answers stay separate for future scoring.
+3. Build the context, run Laya once, and apply the delete threshold.
+4. Compare the result with the separate answer key. Reports contain scores and counts, not email bodies.
 
 Message objects cannot be edited in place, preventing tests from changing each other's data. Prior context excludes messages with the same or a later timestamp; earlier messages are sorted by timestamp, then ID.
 
@@ -45,7 +59,7 @@ JSONL means one JSON object per line. Use synthetic mail in public fixtures; kee
 
 Each case references a message and expects either `archive`, `delete` or an explicit error. Related cases must stay in the same dataset split. The loader checks fields, IDs, references and split boundaries.
 
-See the [evaluator plan](evaluator-plan.md) for record examples and remaining implementation work. The current seed data checks the foundation, not model accuracy.
+The original seed data checks the foundation. The larger evaluation corpus measures this particular prompt/model combination; it does not establish real-mail accuracy.
 
 ## Troubleshooting: Python cannot find `sweep`
 

@@ -33,9 +33,9 @@ Results go to a new timestamped folder under `reports/`: `report.md`, `results.j
 
 See [baseline results](baseline.md) and the [evaluator reference](evaluator-plan.md).
 
-## Code map
+## Architecture map
 
-[Browse the current code map](code-map.md) to see files, major functions and their connections. Update it whenever those responsibilities or connections change. The [architecture guide](architecture.md) describes the planned Gmail and cloud system.
+[Browse the architecture map](architecture.md#implemented-evaluator) to see the current code and how it fits into the planned Gmail system. Keep its file links and diagrams current as implementation changes.
 
 ## How evaluation works
 

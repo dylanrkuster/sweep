@@ -38,19 +38,13 @@ If Python cannot find `sweep`, see the [setup troubleshooting notes](docs/develo
 
 ## Architecture
 
-[![Sweep architecture: Gmail sends actions to the Modal API; a controller selects messages; the Laya worker processes them and saves results in Firestore.](docs/assets/architecture.svg)](docs/assets/architecture.svg)
-
-Google displays Sweep's interface inside Gmail. Our Python API on Modal receives button clicks and starts background jobs. A worker loads Laya into its own process, handles emails one at a time through the Gmail API, and saves progress in Firestore. Modal stores the model files between runs.
-
-This is the selected design, not a deployed system or a measured performance promise. The [architecture guide](docs/architecture.md) explains each component, where its code runs, and how one Sweep request moves through the system.
+[Explore the architecture](docs/architecture.md) to see the planned Gmail system and the code implemented so far.
 
 ## Development plan
 
 We begin with a standalone Laya evaluator and a reusable fake mailbox. Synthetic messages stay separate from their expected answers, so Laya only receives email content and preferences. The same message format and decision code will later serve the real Gmail worker; the fake mailbox will grow to support job and recovery tests.
 
 - [Product scope](docs/product.md): MVP behavior, decisions and input budgets.
-- [Code map](docs/code-map.md): current files, major functions and how they connect.
-- [Architecture explained](docs/architecture.md): components, communication and job lifecycle.
 - [Database design](docs/database.md): proposed records, example documents and recovery rules.
 - [Evaluator implementation plan](docs/evaluator-plan.md): the first build, step by step.
 

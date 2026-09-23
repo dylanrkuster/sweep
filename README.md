@@ -10,28 +10,27 @@ Follow the pink arrows. Solid boxes are implemented; dashed boxes are planned. F
 
 ```mermaid
 flowchart TB
-    start["1. Start local evaluation<br/>evaluation/__main__.py<br/>main()"]
-    fixtures["2. Load sample emails and answers<br/>testing/fixtures.py<br/>load_messages() and load_cases()"]
-    runner["3. Run each case<br/>evaluation/runner.py<br/>run_cases()"]
-    fake["4. Read the fake mailbox<br/>testing/mailbox.py<br/>InMemoryMailbox"]
-    engine["5. Decide one email<br/>decisions/engine.py<br/>evaluate_decision()"]
-    context["6. Prepare the model input<br/>decisions/context.py<br/>build_context()"]
-    laya["7. Score Archive and Trash<br/>decisions/laya.py<br/>LayaRuntime.predict()"]
-    policy["8. Choose the final action<br/>decisions/policy.py<br/>apply_policy()"]
-    compare["9. Compare with the answer key<br/>evaluation/runner.py<br/>CaseResult"]
-    report["10. Save scores and timings<br/>evaluation/reports.py and metrics.py<br/>write_reports()"]
+    start("1. Start local evaluation<br/>evaluation/__main__.py<br/>main()")
+    fixtures("2. Load sample emails and answers<br/>testing/fixtures.py<br/>load_messages() and load_cases()")
+    runner("3. Run each case<br/>evaluation/runner.py<br/>run_cases()")
+    fake("4. Read the fake mailbox<br/>testing/mailbox.py<br/>InMemoryMailbox")
+    engine("5. Decide one email<br/>decisions/engine.py<br/>evaluate_decision()")
+    context("6. Prepare the model input<br/>decisions/context.py<br/>build_context()")
+    laya("7. Score Archive and Trash<br/>decisions/laya.py<br/>LayaRuntime.predict()")
+    policy("8. Choose the final action<br/>decisions/policy.py<br/>apply_policy()")
+    compare("9. Compare with the answer key<br/>evaluation/runner.py<br/>CaseResult")
+    report("10. Save scores and timings<br/>evaluation/reports.py and metrics.py<br/>write_reports()")
 
-    gmail_ui["Gmail add-on · planned<br/>Preferences, number of emails, Sweep button"]
-    api["Modal API + job · planned<br/>Select unread emails, newest first"]
-    worker["Modal worker · planned<br/>Process one email at a time"]
-    gmail_api["Gmail API · planned<br/>Archive or Trash, then mark read"]
-    firestore["Firestore · planned<br/>Save job progress and result counts"]
+    gmail_ui("Gmail add-on · planned<br/>Preferences, number of emails, Sweep button")
+    api("Modal API + job · planned<br/>Select unread emails, newest first")
+    worker("Modal worker · planned<br/>Process one email at a time")
+    gmail_api("Gmail API · planned<br/>Archive or Trash, then mark read")
+    firestore("Firestore · planned<br/>Save job progress and result counts")
 
     start --> fixtures --> runner --> fake --> engine --> context --> laya --> policy --> compare --> report
     gmail_ui --> api --> worker
     worker -->|reuse decision code| engine
     policy -->|hosted sweep| gmail_api --> firestore
-    worker --> firestore
 
     linkStyle default stroke:#e46b9f,stroke-width:4px;
     classDef input fill:#414141,stroke:#4c90ea,stroke-width:3px,color:#ffffff;

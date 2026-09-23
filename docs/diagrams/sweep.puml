@@ -1,0 +1,103 @@
+@startuml sweep
+' Render with Java 21+ and PlantUML 1.2026.8. No Graphviz required.
+' java -jar plantuml.jar -tsvg -nometadata docs/diagrams/sweep.puml
+!pragma layout elk
+top to bottom direction
+
+skinparam backgroundColor #F7F9FC
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 15
+skinparam defaultFontColor #182B44
+skinparam shadowing false
+skinparam roundCorner 16
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam ArrowColor #B93970
+skinparam ArrowThickness 3
+skinparam ArrowFontColor #74314D
+skinparam ArrowFontSize 13
+skinparam nodesep 45
+skinparam ranksep 50
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #50647D
+  BorderThickness 2
+}
+skinparam rectangle {
+  BorderThickness 2
+  BorderColor #50647D
+  FontStyle bold
+  FontSize 19
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #4478AD
+  BorderThickness 2
+}
+skinparam artifact {
+  BackgroundColor #FFFFFF
+  BorderColor #2C806C
+  BorderThickness 2
+}
+
+title Sweep — architecture and code
+caption Paths are under src/sweep/ unless shown otherwise. Planned boxes have no implementation yet.
+
+rectangle "Gmail product · planned" as Hosted #F1F4F9 {
+  component "Gmail interface\nGoogle\n\n" as GmailUI #EDF4FF
+  component "Python API\nModal\n\n" as API #FFF4D9
+  component "Dispatch + selection\nModal\n\n" as Dispatch #FFF4D9
+  component "Sweep worker\nModal\n\n" as Worker #FFF4D9
+  database "Gmail mailbox\nGoogle\n\n" as Gmail #EDF4FF
+  database "Saved records\nGoogle · Firestore\n\n" as Firestore #EDF4FF
+  component "Model files\nModal · Volume\n\n" as Volume #FFF4D9
+
+  GmailUI .right.> API : HTTPS
+  API .down.> Dispatch
+  Dispatch .down.> Worker
+  Worker .left.> Gmail : read + change mail
+  Volume .left.> Worker
+  API -[dashed,norank]-> Firestore
+  Dispatch -[dashed,norank]-> Firestore
+  Worker -[dashed,norank]-> Firestore
+  Dispatch -[hidden]right-> Firestore
+  Firestore -[hidden]down-> Volume
+  GmailUI -[hidden]down-> Gmail
+}
+
+rectangle "Decision code · implemented locally" as Core #FFF4D9 {
+  component "**Decide one email**\ndecisions/engine.py\nevaluate_decision()\n----\ndomain.py · Message, DecisionInput" as Engine
+  component "**Prepare the input**\ndecisions/context.py · build_context()\ndecisions/question.py · decision_question()" as Context
+  component "**Run Laya English**\ndecisions/laya.py · LayaRuntime.predict()\ndecisions/artifacts.py\ndownload_model(), verify_model()" as Laya
+  component "**Choose Archive or Trash**\ndecisions/policy.py · apply_policy()" as Policy
+  Engine --> Context
+  Engine --> Laya
+  Engine --> Policy
+  Context -[hidden]right-> Laya
+  Laya -[hidden]right-> Policy
+}
+
+rectangle "Local evaluation + tests · implemented" as Local #E9F6F0 {
+  artifact "**Synthetic emails + separate answers**\ntests/fixtures/\nmessages.jsonl + cases.jsonl\nevaluation/ contains the larger corpus" as Fixtures
+  component "**Reusable fake mailbox**\ntesting/fixtures.py\nload_messages(), load_cases()\ntesting/mailbox.py · InMemoryMailbox" as Mailbox
+  component "**Run evaluation**\nevaluation/~_~_main~_~_.py · main()\nevaluation/runner.py · run_cases()\nCaseResult compares after prediction" as Evaluator
+  component "**Save scores + timings**\nevaluation/reports.py · write_reports()\nevaluation/metrics.py\nsummarize(), timing_summary()\n----\nOutput: reports/" as Reports
+  component "**Check the code**\ntesting/~_~_main~_~_.py · main(): fixture check\ntests/test_*.py: pytest\nMailbox, decisions, evaluator, reports" as Tests
+  Mailbox --> Fixtures : load
+  Evaluator --> Mailbox : read mail
+  Evaluator --> Reports : results
+  Tests --> Mailbox : validate
+}
+
+Worker .down.> Core : reuses
+Evaluator --> Core : evaluate_decision()
+Tests -[norank]-> Evaluator : test
+
+legend bottom left
+  <b>Solid arrow</b>  implemented call / data access
+  <b>Dotted arrow</b>  planned connection
+  Firestore will hold preferences, jobs and saved counts.
+  Model files are local today; the Modal Volume is planned.
+  Expected answers never enter the decision code.
+endlegend
+@enduml
